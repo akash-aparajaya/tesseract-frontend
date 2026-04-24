@@ -1,0 +1,11 @@
+:root {
+  --primary-color:   #4f46e5;
+  --text-color:      #1f2937;
+  --bg-color:        #f9fafb;
+  --sidebar-width:   250px;
+  --header-height:   60px;
+  --border-radius:   8px;
+  --spacing-sm:      8px;
+  --spacing-md:      16px;
+  --spacing-lg:      24px;
+}

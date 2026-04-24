@@ -1,0 +1,442 @@
+/* --- 1. FONTS & RESET --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+  --sb-width: 260px;
+  --sb-bg: #111827;
+  --sb-hover: #1f2937;
+  --active-blue: #3b82f6;
+  --text-muted: #9ca3af;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background-color: #dee3e8;
+}
+
+/* --- 2. SIDEBAR STRUCTURE --- */
+.sidebar {
+  width: var(--sb-width);
+  height: 100vh;
+  background-color: var(--sb-bg);
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-top {
+  flex: 1; /* Pushes everything below it (logout) to the bottom */
+}
+
+.logo-section {
+  padding: 30px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.main-logo {
+  max-width: 140px;
+  height: auto;
+}
+
+/* --- 3. MENU ITEMS & HOVER --- */
+.menu-item {
+  margin: 4px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+  background-color: var(--sb-hover);
+}
+
+.menu-item.active {
+  background-color: var(--active-blue);
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+}
+
+.link-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sideBar-logo {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* --- 4. DROPDOWN (CHILDREN) --- */
+.dropdown-container {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-container.open {
+  max-height: 500px; /* Increased to allow for more children */
+  opacity: 1; /* Changed from 5 to 1 (opacity max is 1) */
+}
+
+.dropdown-item {
+  padding: 12px 10px 12px 52px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent; /* Prepare for active border */
+}
+
+.dropdown-item:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding-left: 58px;
+}
+
+/* 🟢 THE ACTIVE CHILD STATE */
+.dropdown-item.active-child {
+  color: #f03355; /* Your brand color */
+  background-color: rgba(240, 51, 85, 0.1); /* Subtle red background */
+  font-weight: 600;
+  padding-left: 58px; /* Matches hover indentation */
+  border-left: 3px solid #f03355; /* Solid red line on the left */
+}
+
+/* --- 5. LOGOUT & LOADER --- */
+.logout-item {
+  margin-top: auto;
+  margin-bottom: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- 6. POPUP BOX --- */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.popup-box {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 350px;
+  text-align: center;
+  animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.popup-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btn-no { padding: 10px 20px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 6px; }
+.btn-yes { padding: 10px 20px; border: none; background: #ef4444; color: white; cursor: pointer; border-radius: 6px; }
+
+/* --- 7. MAIN CONTENT WRAPPER --- */
+.page-wrapper {
+  margin-left: var(--sb-width);
+  padding: 40px;
+}
+
+.form-container {
+  background: #f4f4f4;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 40px auto;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.form-group input[type="text"], 
+.form-group textarea {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* --- project creation  --- */
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two perfect columns */
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.checkbox-item {
+  display: flex;         /* Horizontal layout */
+  align-items: center;    /* Vertical center alignment */
+  gap: 12px;             /* Space between box and text */
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  cursor: pointer;
+}
+
+.checkbox-item input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkbox-item label {
+  margin: 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.btn-submit {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #e0e0e0;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toast-banner {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 24px;
+  border-radius: 6px;
+  color: white;
+  z-index: 1000;
+  font-weight: bold;
+}
+.toast-success { background: #28a745; }
+.toast-error { background: #dc3545; }
+
+/* --- project dashboard --- */
+
+.dashboard-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.header-text h1 {
+  font-size: 28px;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.header-text p {
+  color: #666;
+  margin-top: 5px;
+}
+
+.create-new-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.create-new-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+/* Grid Layout */
+.project-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* Card Design */
+.individual-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.individual-card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.status-pill {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 99px;
+}
+
+.status-pill.active { background: #dcfce7; color: #166534; }
+.status-pill.inactive { background: #e28c8c; color: #6d1414; }
+
+.client-name {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.card-title {
+  font-size: 18px;
+  color: #111827;
+  margin: 0 0 12px 0;
+}
+
+.card-description {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  min-height: 60px;
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.service-tag {
+  background: #eff6ff;
+  color: #1e40af;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.card-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.date-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-info small { color: #9ca3af; font-size: 11px; }
+.date-info span { font-size: 13px; font-weight: 600; color: #374151; }
+
+.action-icon {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.edit-icon { color: #2563eb; }
+.delete-icon { color: #ef4444; }
+
+.action-icon:hover { background: #f3f4f6; }

@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+
+    // Required when using "references" in tsconfig.json
+    "composite": true,
+
+    // What version of JavaScript to output
+    "target": "ES2020",
+
+    // How modules are written (ESNext = modern import/export)
+    "module": "ESNext",
+
+    // How TypeScript finds imported modules
+    "moduleResolution": "bundler",
+
+    // Allow importing .json files as modules
+    "resolveJsonModule": true,
+
+    // Each file is compiled independently
+    "isolatedModules": true,
+
+    // Allow importing .ts extensions directly
+    // ⚠️ This requires either noEmit, emitDeclarationOnly, or rewriteRelativeImportExtensions
+    "allowImportingTsExtensions": true,
+
+    // ✅ Fix — allows allowImportingTsExtensions to work with composite: true
+    "emitDeclarationOnly": true,
+
+    // Enable all strict type checks
+    "strict": true,
+
+    // Skip type checking of node_modules
+    "skipLibCheck": true
+  },
+
+  // Only apply this config to vite.config.ts
+  "include": ["vite.config.ts"]
+}
