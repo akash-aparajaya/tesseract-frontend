@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { useNavigate,  } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 import "../styles/login.css";
@@ -7,13 +7,7 @@ import logo from "../assets/logo.svg";
 import { loginUser } from "../services/authApi";
 import { FormState, Errors, Toast } from "../types/login.type";
 
-// --- STEP 1: Define the Props Interface ---
-interface LoginProps {
-  setActivePage: (page: string) => void;
-}
-
-// --- STEP 2: Apply the Interface to the Component ---
-export default function Login({ setActivePage }: LoginProps) {
+export default function Login() {
   const [form, setForm] = useState<FormState>({
     email: "",
     password: "",
@@ -49,7 +43,6 @@ export default function Login({ setActivePage }: LoginProps) {
 
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
-    console.error(errors)
       setErrors(validationErrors);
       return;
     }
@@ -63,16 +56,16 @@ export default function Login({ setActivePage }: LoginProps) {
       if (res?.data?.success) {
         const { accessToken, refreshToken } = res.data.data;
 
+        // Save tokens
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
 
         showToast("Login successful 🎉", "success");
 
-        // --- STEP 3: Navigate via State and Route ---
+        // Navigate to dashboard
         setTimeout(() => {
-          setActivePage("dashboard"); // Updates Layout state
-          navigate("/dashboard");     // Updates Browser URL
-        }, 1500);
+          navigate("/dashboard");
+        }, 1000);
       } else {
         showToast(res?.data?.message || "Login failed", "error");
       }
@@ -116,23 +109,36 @@ export default function Login({ setActivePage }: LoginProps) {
               <h2>Welcome back</h2>
               <p>Sign in to your account</p>
             </header>
+
             <form onSubmit={handleSubmit}>
               <div className="input-group">
                 <label>Email</label>
                 <input
                   type="email"
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, email: e.target.value })
+                  }
                 />
+                {errors.email && (
+                  <span className="error-text">{errors.email}</span>
+                )}
               </div>
+
               <div className="input-group">
                 <label>Password</label>
                 <input
                   type="password"
                   value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
                 />
+                {errors.password && (
+                  <span className="error-text">{errors.password}</span>
+                )}
               </div>
+
               <button className="login-btn" type="submit" disabled={loading}>
                 {loading ? "Loading..." : "Login"}
               </button>

@@ -1,23 +1,13 @@
-import { useState } from "react";
+import { Outlet, useNavigation } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Login from "../pages/login"; // Your login file
-import ProjectCreateForm from "../pages/ProjectCreateForm";
-import ProjectDashboard from "@/pages/ProjectDashboard";
+import PageLoader from "./common/Loader";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  // Use "login" as initial state if no token exists
-  const [activePage, setActivePage] = useState(
-    localStorage.getItem("accessToken") ? "dashboard" : "login",
-  );
-
-  // If the user is on the login page, show ONLY the Login component
-  if (activePage === "login") {
-    return <Login setActivePage={setActivePage} />;
-  }
+export default function Layout() {
+  const navigation = useNavigation();
 
   return (
     <div style={{ display: "flex" }}>
-      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      <Sidebar />
 
       <main
         style={{
@@ -28,17 +18,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           backgroundColor: "#f9fafb",
         }}
       >
-        {/* Render children (Dashboard) only if activePage is not login */}
-        {activePage === "dashboard" && children}
-        {activePage === "settings" && <h1>Admin DashBoard</h1>}
-        {activePage === "adminDashboard" && <h1>Admin Creation </h1>}
-        {activePage === "adminCreation" && <h1>Service </h1>}
-        {activePage === "projectDash" && 
-        <ProjectDashboard setActivePage={setActivePage} />}
+        {/* 🔥 GLOBAL LOADER */}
+        {navigation.state === "loading" && <PageLoader />}
 
-        {activePage === "project-create" && (
-          <ProjectCreateForm setActivePage={setActivePage} />
-        )}{" "}
+        <Outlet />
       </main>
     </div>
   );

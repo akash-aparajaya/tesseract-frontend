@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createProject } from "../services/projectApi";
 import { useToast } from "../hooks/useToast";
 
 const AVAILABLE_SERVICES = ["SMS", "EMAIL"];
 
-export default function ProjectCreateForm({ setActivePage }: { setActivePage: (page: string) => void }) {
+export default function ProjectCreateForm() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     project_name: "",
     project_description: "",
@@ -14,6 +17,9 @@ export default function ProjectCreateForm({ setActivePage }: { setActivePage: (p
 
   const { toast, showToast } = useToast();
 
+  /* =========================================================
+     HANDLE SERVICE SELECT
+     ========================================================= */
   const handleServiceChange = (service: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -23,6 +29,9 @@ export default function ProjectCreateForm({ setActivePage }: { setActivePage: (p
     }));
   };
 
+  /* =========================================================
+     SUBMIT FORM
+     ========================================================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -33,17 +42,28 @@ export default function ProjectCreateForm({ setActivePage }: { setActivePage: (p
 
     try {
       const res = await createProject(formData);
+
       if (res?.data?.success) {
         showToast("Project created successfully!", "success");
-        setTimeout(() => setActivePage("dashboard"), 1500); 
+
+        // ✅ FIXED NAVIGATION
+        setTimeout(() => {
+          navigate("/dashboard/project");
+        }, 1500);
       }
-    } catch (error: any) {
-      const msg = error.response?.data?.message || "Error creating project";
-      showToast(msg, "error");
-      // App does not navigate, so user stays to fix errors
+    } catch (error: unknown) {
+      // ✅ FIXED TYPE (no 'any')
+      if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("Error creating project", "error");
+      }
     }
   };
 
+  /* =========================================================
+     UI
+     ========================================================= */
   return (
     <div className="form-container">
       {toast.show && (
@@ -53,51 +73,70 @@ export default function ProjectCreateForm({ setActivePage }: { setActivePage: (p
       )}
 
       <h2>Create New Project</h2>
+
       <form onSubmit={handleSubmit}>
+        {/* Project Name */}
         <div className="form-group">
           <label>Project Name</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Enter project name"
-            onChange={(e) => setFormData({...formData, project_name: e.target.value})}
-            required 
+            value={formData.project_name}
+            onChange={(e) =>
+              setFormData({ ...formData, project_name: e.target.value })
+            }
+            required
           />
         </div>
 
+        {/* Description */}
         <div className="form-group">
           <label>Description</label>
-          <textarea 
-            placeholder="Project details..." 
+          <textarea
+            placeholder="Project details..."
             rows={4}
-            onChange={(e) => setFormData({...formData, project_description: e.target.value})}
+            value={formData.project_description}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                project_description: e.target.value,
+              })
+            }
           />
         </div>
 
+        {/* Services */}
         <div className="form-group">
           <label>Services *</label>
+
           <div className="services-grid">
             {AVAILABLE_SERVICES.map((service) => (
-              <div 
-                key={service} 
-                className="checkbox-item" 
+              <div
+                key={service}
+                className="checkbox-item"
                 onClick={() => handleServiceChange(service)}
               >
                 <input
                   type="checkbox"
-                  id={service}
                   checked={formData.services.includes(service)}
-                  onChange={() => {}} // Controlled by parent div click
+                  readOnly
                 />
-                <label htmlFor={service}>{service}</label>
+                <label>{service}</label>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Actions */}
         <div className="form-actions">
-          <button type="button" className="btn-cancel" onClick={() => setActivePage("dashboard")}>
+          <button
+            type="button"
+            className="btn-cancel"
+            onClick={() => navigate("/dashboard/project")}
+          >
             Cancel
           </button>
+
           <button type="submit" className="btn-submit">
             Create Project
           </button>
