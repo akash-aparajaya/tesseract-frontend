@@ -62,7 +62,7 @@ const router = createBrowserRouter([
         element: <ProjectCreateForm />,
       },
       {
-        path: "project-view/:id",
+        path: "project/:projectId/logs",          // ✅ new route
         element: <ProjectView />,
       },
     ],

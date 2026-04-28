@@ -10,6 +10,11 @@ import projectIcon from "../assets/sidebarLogos/backlog.png";
 import service from "../assets/sidebarLogos/service.png";
 import logOut from "../assets/sidebarLogos/log-out.png";
 
+interface DecodedToken {
+  role: string;
+  // Add other properties if needed, e.g., exp: number;
+}
+
 export default function Sidebar() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -30,18 +35,17 @@ export default function Sidebar() {
     }, 2000);
   };
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
+  let role: DecodedToken | null = null;
 
-let role: string | unknown = null;
-
-if (token) {
-  try {
-    const decoded: string = jwtDecode(token);
-    role = decoded;
-  } catch (err: unknown) {
-    console.log("Invalid token", err);
+  if (token) {
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      role = decoded;
+    } catch (err: unknown) {
+      console.log("Invalid token", err);
+    }
   }
-}
 
   return (
     <>
@@ -71,7 +75,7 @@ if (token) {
 
           {/* Admin */}
 
-          {role === "SUPER_ADMIN" && (
+          {role && role.role=== "SUPER_ADMIN" && (
             <NavLink
               to="/dashboard/admin"
               className={({ isActive }) =>

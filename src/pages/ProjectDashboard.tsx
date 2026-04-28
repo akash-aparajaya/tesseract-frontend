@@ -1,199 +1,417 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getProjects } from "../services/projectApi";
-import { useToast } from "../hooks/useToast";
-import Skeleton from "../components/common/Skeleton";
+import "../styles/ProjectDashboard.css";
 
-/* =========================================================
-   1. PROJECT TYPE
-   ========================================================= */
 interface Project {
-  _id: string;
-  project_name: string;
-  project_description: string;
+  id: number;
+  name: string;
+  description?: string;
+  status: "active" | "inactive";
+  created: string;
   services: string[];
-  isActive: boolean;
-  createdAt: Date | string;
 }
 
-/* =========================================================
-   2. COMPONENT
-   ========================================================= */
+// Mock service options (from API)
+const availableServices = [
+  { id: "sms", label: "SMS" },
+  { id: "email", label: "Email" },
+  { id: "whatsapp", label: "WhatsApp" },
+];
+
+const mockProjects: Project[] = [
+  { id: 1, name: "Notification System", description: "Multi-channel notification service", status: "active", created: "2025-01-10", services: ["sms", "email", "whatsapp"] },
+  { id: 2, name: "E-Commerce App", description: "Online shopping platform", status: "active", created: "2025-02-15", services: ["sms", "email", "whatsapp"] },
+  { id: 3, name: "HR Management System", description: "Payroll & HR tools", status: "inactive", created: "2025-03-01", services: ["email"] },
+  { id: 4, name: "Support Tracker", description: "Ticket tracking", status: "active", created: "2025-03-10", services: ["sms", "whatsapp"] },
+  { id: 5, name: "Sales Dashboard", description: "Real-time analytics", status: "active", created: "2025-03-20", services: ["email", "whatsapp"] },
+  { id: 6, name: "Inventory Manager", description: "Stock management", status: "inactive", created: "2025-04-01", services: ["sms"] },
+  { id: 7, name: "Customer Portal", description: "Self-service portal", status: "active", created: "2025-04-05", services: ["whatsapp"] },
+  { id: 8, name: "Analytics Pipeline", description: "Data pipeline", status: "active", created: "2025-04-10", services: ["sms", "email"] },
+  { id: 9, name: "API Gateway", description: "Central gateway", status: "active", created: "2025-04-15", services: ["email"] },
+];
+
 export default function ProjectDashboard() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const { toast, showToast } = useToast();
   const navigate = useNavigate();
+  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [showViewModal, setShowViewModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  
+  // Create project form state
+  const [createForm, setCreateForm] = useState({
+    name: "",
+    description: "",
+    services: [] as string[],
+  });
+  const [createErrors, setCreateErrors] = useState({ name: "" });
+  
+  // Edit form state
+  const [editForm, setEditForm] = useState({ name: "", description: "", status: "", services: [] as string[] });
 
-  /* =========================================================
-     3. FETCH PROJECTS
-     ========================================================= */
-  useEffect(() => {
-    const fetchProjects = async () => {
-      const startTime = Date.now();
+  // Filter & Pagination
+  const filteredProjects = projects.filter(p =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (p.description && p.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+  const totalPages = Math.ceil(filteredProjects.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const paginatedProjects = filteredProjects.slice(startIndex, startIndex + rowsPerPage);
 
-      try {
-        setLoading(true);
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
 
-        const res = await getProjects();
+  const handleRowsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setRowsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
-        if (res?.data?.success) {
-          setProjects(res.data.data);
-        } else {
-          showToast("Failed to fetch projects", "error");
-        }
-      } catch (error: unknown) {
-        console.error("Dashboard Error:", error);
+  const toggleStatus = (id: number) => {
+    setProjects(prev =>
+      prev.map(p => p.id === id ? { ...p, status: p.status === "active" ? "inactive" : "active" } : p)
+    );
+  };
 
-        if (error instanceof Error) {
-          showToast(error.message, "error");
-        } else {
-          showToast("Server connection failed", "error");
-        }
-      } finally {
-        const elapsed = Date.now() - startTime;
-        const remaining = 1000 - elapsed;
+  const handleDelete = (id: number) => {
+    setProjects(prev => prev.filter(p => p.id !== id));
+    setShowDeleteConfirm(null);
+  };
 
-        setTimeout(
-          () => {
-            setLoading(false);
-          },
-          remaining > 0 ? remaining : 0,
-        );
-      }
+  const handleView = (project: Project) => {
+    setSelectedProject(project);
+    setShowViewModal(true);
+  };
+
+  const handleEditOpen = () => {
+    if (selectedProject) {
+      setEditForm({
+        name: selectedProject.name,
+        description: selectedProject.description || "",
+        status: selectedProject.status,
+        services: [...selectedProject.services],
+      });
+      setShowViewModal(false);
+      setShowEditModal(true);
+    }
+  };
+
+  const handleUpdate = () => {
+    if (selectedProject) {
+      setProjects(prev =>
+        prev.map(p =>
+          p.id === selectedProject.id
+            ? { ...p, name: editForm.name, description: editForm.description, status: editForm.status as "active" | "inactive", services: editForm.services }
+            : p
+        )
+      );
+      setSelectedProject({ ...selectedProject, ...editForm, status: editForm.status as "active" | "inactive" });
+      setShowEditModal(false);
+    }
+  };
+
+  const toggleEditService = (service: string) => {
+    setEditForm(prev => ({
+      ...prev,
+      services: prev.services.includes(service) ? prev.services.filter(s => s !== service) : [...prev.services, service]
+    }));
+  };
+
+  // Create project logic
+  const toggleCreateService = (serviceId: string) => {
+    setCreateForm(prev => ({
+      ...prev,
+      services: prev.services.includes(serviceId)
+        ? prev.services.filter(s => s !== serviceId)
+        : [...prev.services, serviceId]
+    }));
+  };
+
+  const handleCreateProject = () => {
+    if (!createForm.name.trim()) {
+      setCreateErrors({ name: "Project name is required" });
+      return;
+    }
+    const newId = Math.max(...projects.map(p => p.id), 0) + 1;
+    const today = new Date().toISOString().slice(0, 10);
+    const newProject: Project = {
+      id: newId,
+      name: createForm.name,
+      description: createForm.description || "No description",
+      status: "active",
+      created: today,
+      services: createForm.services,
     };
+    setProjects([...projects, newProject]);
+    setCreateForm({ name: "", description: "", services: [] });
+    setCreateErrors({ name: "" });
+    setShowCreateModal(false);
+  };
 
-    fetchProjects();
-  }, [showToast]);
+  const activeCount = projects.filter(p => p.status === "active").length;
+  const inactiveCount = projects.length - activeCount;
 
-  /* =========================================================
-     4. UI
-     ========================================================= */
   return (
-    <div className="dashboard-container">
-      {/* ================= Toast ================= */}
-      {toast.show && (
-        <div className={`toast-banner toast-${toast.type}`}>
-          {toast.message}
-        </div>
-      )}
-
-      {/* ================= Header ================= */}
-      <header className="dashboard-header">
-        <div className="header-text">
+    <div className="project-dashboard">
+      <div className="dashboard-header">
+        <div>
           <h1>Projects Control Center</h1>
-
-          {loading ? (
-            <Skeleton width={220} height={16} />
-          ) : (
-            <p>You have {projects.length} active projects in your pipeline.</p>
-          )}
+          <p className="subtitle">Manage and monitor all your projects</p>
         </div>
-
-        <button
-          className="create-new-btn"
-          onClick={() => navigate("/dashboard/project-create")}
-        >
+        <button className="create-project-btn" onClick={() => setShowCreateModal(true)}>
           + Create Project
         </button>
-      </header>
+      </div>
 
-      {/* ================= Loading ================= */}
-      {loading && (
-        <div className="project-card-grid">
-          {" "}
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="individual-card">
-              {" "}
-              {/* Top */}{" "}
-              <div className="card-top">
-                {" "}
-                <Skeleton width={60} height={20} />{" "}
-                <Skeleton width={80} height={14} />{" "}
-              </div>{" "}
-              {/* Title */}{" "}
-              <Skeleton width="70%" height={20} style={{ marginTop: 10 }} />{" "}
-              {/* Description */}{" "}
-              <Skeleton width="100%" height={14} style={{ marginTop: 10 }} />{" "}
-              <Skeleton width="90%" height={14} style={{ marginTop: 6 }} />{" "}
-              {/* Tags */}{" "}
-              <div className="tag-container" style={{ marginTop: 10 }}>
-                {" "}
-                <Skeleton width={60} height={20} />{" "}
-                <Skeleton width={50} height={20} />{" "}
-              </div>{" "}
-              {/* Footer */}{" "}
-              <div className="card-footer">
-                {" "}
-                <Skeleton width={80} height={14} />{" "}
-                <Skeleton width={40} height={20} />{" "}
-              </div>{" "}
+      {/* Stat Cards */}
+      <div className="stats-container">
+        <div className="stat-card total">
+          <div className="stat-icon">📋</div>
+          <div className="stat-info">
+            <div className="stat-number">{projects.length}</div>
+            <div className="stat-label">Total Projects</div>
+          </div>
+        </div>
+        <div className="stat-card active">
+          <div className="stat-icon">🚀</div>
+          <div className="stat-info">
+            <div className="stat-number">{activeCount}</div>
+            <div className="stat-label">Active Projects</div>
+          </div>
+        </div>
+        <div className="stat-card inactive">
+          <div className="stat-icon">⏸️</div>
+          <div className="stat-info">
+            <div className="stat-number">{inactiveCount}</div>
+            <div className="stat-label">Inactive Projects</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search by project name or description..."
+          value={searchTerm}
+          onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+        />
+      </div>
+
+      <div className="table-wrapper">
+        <table className="projects-table">
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Project Name</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Services</th>
+              <th>Logs</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedProjects.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="empty-row">No projects found.</td>
+              </tr>
+            ) : (
+              paginatedProjects.map((project, idx) => (
+                <tr key={project.id} className={project.status === "inactive" ? "inactive-row" : ""}>
+                  <td>{(currentPage - 1) * rowsPerPage + idx + 1}</td>
+                  <td className="project-name">{project.name}</td>
+                  <td>
+                    <label className="toggle-switch">
+                      <input type="checkbox" checked={project.status === "active"} onChange={() => toggleStatus(project.id)} />
+                      <span className="slider round"></span>
+                    </label>
+                    <span className={`status-text ${project.status}`}>{project.status === "active" ? "Active" : "Inactive"}</span>
+                  </td>
+                  <td>{project.created}</td>
+                  <td>
+                    <div className="service-badges">
+                      {project.services.includes("sms") && <span className="badge sms">SMS</span>}
+                      {project.services.includes("email") && <span className="badge email">Email</span>}
+                      {project.services.includes("whatsapp") && <span className="badge whatsapp">WhatsApp</span>}
+                    </div>
+                  </td>
+                  <td>
+                    <button className="logs-btn" onClick={() => navigate(`/dashboard/project/${project.id}/logs`)}>
+                      📋 View Logs
+                    </button>
+                  </td>
+                  <td>
+                    <div className="actions-dropdown">
+                      <button className="three-dots">⋮</button>
+                      <div className="dropdown-menu">
+                        <div className="dropdown-item" onClick={() => handleView(project)}>👁️ View</div>
+                        <div className="dropdown-item delete" onClick={() => setShowDeleteConfirm(project.id)}>🗑️ Delete</div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {filteredProjects.length > 0 && (
+        <div className="pagination-container">
+          <div className="rows-selector">
+            <span>Rows per page:</span>
+            <select value={rowsPerPage} onChange={handleRowsChange}>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+            </select>
+          </div>
+          <div className="pagination">
+            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>← Previous</button>
+            <span className="page-info">Page {currentPage} of {totalPages}</span>
+            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>Next →</button>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE PROJECT MODAL */}
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Create New Project</h2>
+              <button className="close-btn" onClick={() => setShowCreateModal(false)}>×</button>
             </div>
-          ))}{" "}
-        </div>
-      )}
-
-      {/* ================= Empty ================= */}
-      {!loading && projects.length === 0 && (
-        <div className="empty-state">
-          <h3>No Projects Found</h3>
-          <p>Click "Create Project" to get started.</p>
-        </div>
-      )}
-
-      {/* ================= REAL DATA ================= */}
-      {!loading && projects.length > 0 && (
-        <div className="project-card-grid">
-          {projects.map((project) => (
-            <div
-              key={project._id}
-              className="individual-card"
-              onClick={() => navigate(`/dashboard/project-view/${project._id}`)}
-              style={{ cursor: "pointer" }}
-            >
-              {/* Top */}
-              <div className="card-top">
-                <span
-                  className={`status-pill ${
-                    project.isActive ? "active" : "inactive"
-                  }`}
-                >
-                  {project.isActive ? "Live" : "Down"}
-                </span>
-              </div>
-
-              {/* Title */}
-              <h2 className="card-title">{project.project_name}</h2>
-
-              {/* Description */}
-              <p className="card-description">{project.project_description}</p>
-
-              {/* Services */}
-              <div className="tag-container">
-                {project.services?.map((service) => (
-                  <span key={service} className="service-tag">
-                    {service}
-                  </span>
+            <div className="form-group">
+              <label>Project Name *</label>
+              <input
+                type="text"
+                value={createForm.name}
+                onChange={(e) => {
+                  setCreateForm({ ...createForm, name: e.target.value });
+                  setCreateErrors({ ...createErrors, name: "" });
+                }}
+                placeholder="Enter project name"
+                className={createErrors.name ? "error" : ""}
+              />
+              {createErrors.name && <span className="error-message">{createErrors.name}</span>}
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                value={createForm.description}
+                onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
+                rows={3}
+                placeholder="Brief description (optional)"
+              />
+            </div>
+            <div className="form-group">
+              <label>Services</label>
+              <div className="checkbox-group">
+                {availableServices.map(service => (
+                  <label key={service.id}>
+                    <input
+                      type="checkbox"
+                      checked={createForm.services.includes(service.id)}
+                      onChange={() => toggleCreateService(service.id)}
+                    />
+                    {service.label}
+                  </label>
                 ))}
               </div>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setShowCreateModal(false)}>Cancel</button>
+              <button className="btn-create" onClick={handleCreateProject}>Create Project</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-              {/* Footer */}
-              <div className="card-footer">
-                <div className="date-info">
-                  <small>Create Date</small>
-                  <span>
-                    {new Date(project.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
+      {/* VIEW MODAL (unchanged but added description row) */}
+      {showViewModal && selectedProject && (
+        <div className="modal-overlay" onClick={() => setShowViewModal(false)}>
+          <div className="modal-container" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Project Details</h2>
+              <button className="close-btn" onClick={() => setShowViewModal(false)}>×</button>
+            </div>
+            <div className="view-details">
+              <div className="detail-row"><label>Name:</label><span>{selectedProject.name}</span></div>
+              <div className="detail-row"><label>Description:</label><span>{selectedProject.description || "—"}</span></div>
+              <div className="detail-row"><label>Status:</label><span className={`status-text ${selectedProject.status}`}>{selectedProject.status === "active" ? "Active" : "Inactive"}</span></div>
+              <div className="detail-row"><label>Created:</label><span>{selectedProject.created}</span></div>
+              <div className="detail-row"><label>Services:</label><div className="service-badges">{selectedProject.services.map(s => <span key={s} className={`badge ${s}`}>{s.toUpperCase()}</span>)}</div></div>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-edit" onClick={handleEditOpen}>✏️ Edit</button>
+              <button className="btn-cancel" onClick={() => setShowViewModal(false)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-                <div className="action-group">
-                  <button className="action-icon edit-icon">✎</button>
-                  <button className="action-icon delete-icon">🗑</button>
-                </div>
+      {/* EDIT MODAL (added description field) */}
+      {showEditModal && selectedProject && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-container" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Edit Project</h2>
+              <button className="close-btn" onClick={() => setShowEditModal(false)}>×</button>
+            </div>
+            <div className="form-group">
+              <label>Project Name</label>
+              <input type="text" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} rows={3} />
+            </div>
+            <div className="form-group">
+              <label>Status</label>
+              <select value={editForm.status} onChange={e => setEditForm({ ...editForm, status: e.target.value })}>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Services</label>
+              <div className="checkbox-group">
+                {availableServices.map(service => (
+                  <label key={service.id}>
+                    <input
+                      type="checkbox"
+                      checked={editForm.services.includes(service.id)}
+                      onChange={() => toggleEditService(service.id)}
+                    />
+                    {service.label}
+                  </label>
+                ))}
               </div>
             </div>
-          ))}
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setShowEditModal(false)}>Cancel</button>
+              <button className="btn-create" onClick={handleUpdate}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {showDeleteConfirm !== null && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(null)}>
+          <div className="modal-container delete-confirm" onClick={e => e.stopPropagation()}>
+            <h3>Delete Project</h3>
+            <p>Are you sure you want to delete this project?</p>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setShowDeleteConfirm(null)}>Cancel</button>
+              <button className="btn-delete" onClick={() => handleDelete(showDeleteConfirm)}>Delete</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

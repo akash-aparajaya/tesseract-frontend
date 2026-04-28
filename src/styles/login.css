@@ -1,164 +1,396 @@
-.login-wrapper {
-  height: 100vh;
-  width: 100vw;
+:root {
+  --primary-dark: #1e3a5f;
+  --primary: #4f8ef7;
+  --success: #00c896;
+  --danger: #f75f5f;
+  --gray-bg: #f4f7fc;
+  --card-bg: #ffffff;
+  --border: #eef2f8;
+  --text-dark: #1a1a2e;
+  --text-muted: #6c7a91;
+  --shadow-md: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+  --radius: 28px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ========== ANIMATED BACKGROUND ========== */
+.login-page {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffffff;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  margin: 0;
+  padding: 20px;
+  position: relative;
+  background: linear-gradient(125deg, #0f1f38, #1e3a5f, #2a5090, #1e3a5f, #0f1f38);
+  background-size: 300% 300%;
+  animation: gradientShift 12s ease infinite;
   overflow: hidden;
-  position: fixed;  
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating animated circles / particles */
+.login-page::before {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(79, 142, 247, 0.15);
+  border-radius: 50%;
+  top: -150px;
+  left: -150px;
+  animation: floatCircle 20s infinite;
+}
+
+.login-page::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(79, 142, 247, 0.1);
+  border-radius: 50%;
+  bottom: -200px;
+  right: -200px;
+  animation: floatCircle 25s infinite reverse;
+}
+
+@keyframes floatCircle {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 20px) scale(1.1); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Additional floating particles (pseudo-element spans are not possible without extra HTML, so we use a subtle backdrop filter) */
+.login-page {
+  backdrop-filter: blur(0px);
+}
+
+/* Dark overlay to improve card contrast (softens the background) */
+.login-page .overlay {
+  display: none; /* we use a pseudo-element instead */
+}
+
+/* Actually add a semi-transparent overlay for better text readability */
+.login-page {
+  background-blend-mode: overlay;
+}
+
+/* But to really make the card pop, we add a dark scrim via an extra pseudo */
+.login-page .bg-overlay {
+  position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 1;
+  pointer-events: none;
 }
 
-/* Toast */
+/* Toast (stays above everything) */
 .toast-popup {
   position: fixed;
-  top: 0;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
   padding: 12px 24px;
-  border-radius: 10px;
-  color: white !important;
-  font-weight: 600;
-  z-index: 100;
+  border-radius: 40px;
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+  box-shadow: var(--shadow-md);
 }
-.toast-popup.success { background: #10b981; }
-.toast-popup.error { background: #ef4444; }
+.toast-popup.success { background: var(--success); }
+.toast-popup.error { background: var(--danger); }
 
-/* The Main Card */
+/* Login Card */
 .login-card {
-  display: flex;
-  width: 1050px;
-  height: 680px;
-  background: white;
-  border: 1px solid #000002;
-  border-radius: 30px;
-  overflow: hidden;
-  box-shadow: 0 40px 100px -20px rgba(0,0,0,0.08);
-}
-
-/* Left Section */
-.login-visual {
-  flex: 1;
-  background-color: #f1f5f9; /* Soft light grey */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 60px;
-  text-align: center;
-}
-
-/* .fintel-logo-wrapper {
-  margin-bottom: 50px;
   width: 100%;
-  display: flex;
-  justify-content: center;
-} */
+  max-width: 460px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25);
+  padding: 40px 36px;
+  animation: fadeInUp 0.5s ease;
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(0px);
+  transition: transform 0.3s;
+}
 
-.main-logo {
-  height: 90px;           /* 👈 Specific height to keep the slogan legible */
-  width: auto;             /* Keeps the aspect ratio perfect */
+.login-card:hover {
+  transform: translateY(-5px);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-card-inner {
+  width: 100%;
+}
+
+.logo-area {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-logo {
+  height: 48px;
+  width: auto;
   object-fit: contain;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.06)); /* Subtle soft shadow */
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
 }
 
-.overlay-content h1 {
-  font-size: 1.85rem;
-  color: #0f172a; /* Deep blue/black */
-  margin: 0 0 12px;
+.logo-fallback {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 1px;
+}
+
+.login-card h2 {
+  font-size: 28px;
   font-weight: 700;
+  color: var(--primary-dark);
+  text-align: center;
+  margin-bottom: 8px;
 }
 
-.overlay-content p {
-  color: #64748b; /* Soft grey */
-  line-height: 1.7;
-  font-size: 1.05rem;
+.welcome-text {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 32px;
 }
 
-/* Right Section */
-.login-form-side {
-  flex: 1.2;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 50px;
+.input-group {
+  margin-bottom: 24px;
 }
 
-.login-form-inner { width: 100%; max-width: 380px; }
+.input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--primary-dark);
+}
 
-h2 { color: black !important; font-size: 1.8rem; font-weight: 700; margin: 0 0 5px; }
-header p { color: #71717a !important; margin-bottom: 35px; }
-
-/* Form Fields */
-.input-group { margin-bottom: 22px; }
-.input-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: black !important; }
-
-input {
+.input-group input {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e4e4e7;
-  border-radius: 12px;
-  background: white !important;
-  color: black !important;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 14px;
   transition: 0.2s;
-  box-sizing: border-box; /* Crucial for sizing */
+  background: white;
 }
 
-input:focus {
+.input-group input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.1);
 }
 
-.input-error { border-color: #ef4444 !important; }
-.error-text { color: #ef4444 !important; font-size: 0.75rem; margin-top: 5px; display: block; }
+.error-text {
+  display: block;
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 4px;
+}
 
 .login-btn {
   width: 100%;
-  padding: 16px;
-  background: black !important;
-  color: white !important;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--primary), #2563eb);
   border: none;
-  border-radius: 12px;
+  border-radius: 40px;
+  color: white;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
+  transition: 0.3s;
+  margin-top: 8px;
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 142, 247, 0.35);
 }
 
 .login-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: auto;
-}
 
-.form-utils {
-  display: flex;
-  justify-content: space-between; /* Pushes "Remember" to left and "Forgot" to right */
-  align-items: center;
-  margin-bottom: 25px;
-  width: 100%;
+.extra-links {
+  text-align: center;
+  margin-top: 20px;
 }
 
 .forgot-link {
-  font-size: 0.85rem;
-  color: #2563eb;      /* Fintel Blue */
-  text-decoration: none;
-  font-weight: 500;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 .forgot-link:hover {
   text-decoration: underline;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+/* Forgot Password Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.forgot-modal {
+  background: white;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 24px;
+  padding: 28px;
+  animation: modalPop 0.2s ease;
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.close-btn:hover {
+  color: var(--danger);
+}
+
+.forgot-modal p {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn-cancel, .btn-submit {
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-weight: 500;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #f1f5f9;
+  color: var(--text-muted);
+}
+.btn-cancel:hover {
+  background: #e2e8f0;
+}
+
+.btn-submit {
+  background: var(--primary);
+  color: white;
+}
+.btn-submit:hover:not(:disabled) {
+  background: #2563eb;
+}
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Password wrapper with eye button */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 45px; /* space for the eye button */
+}
+
+.eye-btn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: 0.2s;
+}
+
+.eye-btn:hover {
+  color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .login-card {
+    padding: 28px 20px;
+  }
+  .login-card h2 {
+    font-size: 24px;
+  }
+}
