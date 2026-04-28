@@ -21,7 +21,7 @@ export const changePasswordApi = (id: number, password: string) => {
 
 //create admin API
 export const createAdminApi = (name: string, email: string, password: string, role: string) => {
-  return api.post("/admin/users", {
+  return api.post("/auth/create-admin", {
     name,
     email,
     password,

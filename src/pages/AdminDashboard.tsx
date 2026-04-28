@@ -156,7 +156,7 @@ const AdminPanelContent: React.FC = () => {
           {users.map(user => (
             <div key={user.id} className={`user-card ${!user.active ? 'inactive' : ''}`}>
               <div className="card-avatar">
-                <div className="avatar">{user.name.charAt(0)}</div>
+                <div className="avatar">{user?.name?.charAt(0)}</div>
               </div>
               <div className="card-info">
                 <div className="info-row">
