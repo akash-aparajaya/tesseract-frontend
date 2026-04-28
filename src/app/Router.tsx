@@ -13,6 +13,7 @@ import AdminCreate from "../pages/AdminCreate";
 
 import ServiceDashboard from "../pages/ServiceDashboard";
 import ServiceCreate from "../pages/ServiceCreation";
+import ForgotPassword from "@/pages/ForgotPassword";
 
 
 const router = createBrowserRouter([
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Login />,
+  },
+  {
+    path: "/forgot-password/:token",
+    element: <ForgotPassword />,
   },
 
   // ================= DASHBOARD LAYOUT =================

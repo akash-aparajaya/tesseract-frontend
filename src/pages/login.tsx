@@ -1,28 +1,24 @@
 import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import "../styles/login.css";
-import logo from "../assets/logo.svg"; // adjust path if needed
-import { loginUser } from "../services/authApi";
-import { FormState, Errors, Toast } from "../types/login.type";
+import logo from "../assets/logo.svg";
+import { loginUser, forgotPasswordApi } from "../services/authApi";
+import { FormState, Errors } from "../types/login.type";
+import { useToast } from "../hooks/useToast"; // adjust path if needed
 
 export default function Login() {
   const [form, setForm] = useState<FormState>({ email: "", password: "" });
   const [loading, setLoading] = useState<boolean>(false);
   const [forgotLoading, setForgotLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Errors>({});
-  const [toast, setToast] = useState<Toast>({ show: false, message: "", type: "" });
   const [showForgotModal, setShowForgotModal] = useState<boolean>(false);
   const [forgotEmail, setForgotEmail] = useState<string>("");
   const [logoError, setLogoError] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false); // 👈 new
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const navigate = useNavigate();
-
-  const showToast = (message: string, type: Toast["type"] = "error") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
-  };
+  const { showToast, ToastContainer } = useToast(); // use the toast hook
 
   const validate = (): Errors => {
     const newErrors: Errors = {};
@@ -67,7 +63,7 @@ export default function Login() {
     }
     setForgotLoading(true);
     try {
-      // await forgotPassword(forgotEmail);
+      await forgotPasswordApi({ email: forgotEmail });
       showToast("Password reset link sent to your email!", "success");
       setShowForgotModal(false);
       setForgotEmail("");
@@ -80,18 +76,8 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <AnimatePresence>
-        {toast.show && (
-          <motion.div
-            initial={{ opacity: 0, y: -60 }}
-            animate={{ opacity: 1, y: 10 }}
-            exit={{ opacity: 0, y: -60 }}
-            className={`toast-popup ${toast.type}`}
-          >
-            {toast.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Render the toast container from the hook */}
+      <ToastContainer />
 
       <div className="login-card">
         <div className="login-card-inner">

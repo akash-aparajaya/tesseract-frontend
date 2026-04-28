@@ -314,6 +314,37 @@ body {
   cursor: pointer;
 }
 
+/* Toast Container */
+.toast-popup {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  min-width: 260px;
+  max-width: 320px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  animation: slideIn 0.3s ease;
+}
+
+/* Success Style */
+.toast-success {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+/* Error Style */
+.toast-error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
 .toast-banner {
   position: fixed;
   top: 20px;
@@ -325,13 +356,13 @@ body {
   font-weight: bold;
 }
 
-.toast-success {
+/* .toast-success {
   background: #28a745;
 }
 
 .toast-error {
   background: #dc3545;
-}
+} */
 
 /* --- project dashboard --- */
 

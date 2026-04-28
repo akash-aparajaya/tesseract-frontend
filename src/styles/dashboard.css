@@ -1,3 +1,6 @@
+/* =============================================
+   GLOBAL VARIABLES & RESET
+   ============================================= */
 :root {
   --primary-dark: #1e3a5f;
   --primary: #4f8ef7;
@@ -30,10 +33,11 @@ body {
 .dashboard {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 24px 32px;
 }
 
-/* HEADER */
+/* =============================================
+   HEADER SECTION
+   ============================================= */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -134,7 +138,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* Bell specific styles */
 .notif-btn {
   position: relative;
 }
@@ -213,7 +216,9 @@ body {
   transform: scale(1.02);
 }
 
-/* HERO */
+/* =============================================
+   HERO SECTION
+   ============================================= */
 .hero {
   background: linear-gradient(120deg, #0f1f38 0%, var(--primary-dark) 45%, #2a5090 100%);
   border-radius: var(--radius);
@@ -244,6 +249,27 @@ body {
 .hero-content {
   position: relative;
   z-index: 2;
+  animation: slideInRight 0.5s ease-out forwards;
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Optional: soft pulse on time numbers every minute */
+.hero-time {
+  transition: text-shadow 0.2s;
+}
+
+.hero-time:hover {
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
 }
 
 .hero-time {
@@ -269,6 +295,24 @@ body {
   align-items: center;
   gap: 14px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: heroCompanyEntrance 0.5s ease-out forwards;
+  transition: transform 0.25s ease, border-color 0.2s;
+}
+
+.hero-company:hover {
+  transform: translateY(-2px);
+  border-color: rgba(79, 142, 247, 0.6);
+}
+
+@keyframes heroCompanyEntrance {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .company-logo {
@@ -294,7 +338,9 @@ body {
   font-style: italic;
 }
 
-/* STATS CARDS */
+/* =============================================
+   STATS CARDS
+   ============================================= */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -349,16 +395,14 @@ body {
   margin-bottom: 4px;
 }
 
-.stat-trend {
-  font-size: 11px;
-  font-weight: 500;
-}
-
-/* TWO-COLUMN LAYOUT */
+/* =============================================
+   TWO COLUMN LAYOUT – EQUAL HEIGHT
+   ============================================= */
 .two-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+  align-items: stretch;
 }
 
 .left-col, .right-col {
@@ -367,122 +411,199 @@ body {
   gap: 24px;
 }
 
-/* CARDS */
-.card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 24px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+/* =============================================
+   AADHAR STYLE PROFILE CARD (LEFT)
+   ============================================= */
+.aadhar-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #d4dcec;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.card-header {
+.aadhar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+.aadhar-header {
+  background: linear-gradient(90deg, #1e3a5f 0%, #2a5090 100%);
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  color: white;
+}
+
+.aadhar-logo {
+  display: flex;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.card-header h3 {
-  font-size: 18px;
+  gap: 8px;
   font-weight: 700;
-  color: var(--primary-dark);
+  font-size: 14px;
+  letter-spacing: 1px;
 }
 
-.card-btn {
-  background: transparent;
-  border: none;
-  font-size: 12px;
-  color: var(--primary);
+.aadhar-title {
+  font-size: 11px;
   font-weight: 600;
-  cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 40px;
-  transition: 0.2s;
+  opacity: 0.8;
+  letter-spacing: 1px;
 }
 
-.card-btn:hover {
-  background: #eef3ff;
+.aadhar-body {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  flex-wrap: wrap;
+  border-bottom: 1px dashed #e2e8f0;
 }
 
-/* PROFILE CARD */
-.profile-content {
+.aadhar-avatar {
   text-align: center;
+  width: 100px;
 }
 
-.profile-avatar {
+.avatar-photo {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #e8f0ff, #c7d8ff);
-  border-radius: 30px;
+  background: #f0f3fa;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 44px;
-  margin: 0 auto 12px;
+  font-size: 48px;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 6px;
 }
 
-.profile-name {
-  font-size: 22px;
-  font-weight: 800;
+.avatar-label {
+  font-size: 10px;
+  color: #5b6e8c;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.aadhar-details {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.detail-group {
+  border-bottom: 1px dotted #eef2f8;
+  padding-bottom: 8px;
   margin-bottom: 4px;
 }
 
-.profile-role {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 20px;
+.detail-group label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #6c7a91;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
 }
 
-.profile-details {
-  text-align: left;
-  background: #f9fbfe;
-  border-radius: var(--radius-sm);
-  padding: 16px;
+.detail-group p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a2e;
+  word-break: break-word;
+  margin: 0;
 }
 
-.detail-row {
+.status-active {
+  color: #00c896;
+  font-weight: 600;
+  width: 100px
+}
+
+.status-inactive {
+  color: #f75f5f;
+  width: 100px
+}
+
+.aadhar-footer {
+  padding: 14px 20px;
+  background: #fafcff;
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  font-size: 13px;
-  border-bottom: 1px solid var(--border);
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-top: 1px solid #eef2f8;
 }
 
-.detail-row:last-child {
-  border-bottom: none;
+.aadhar-id, .aadhar-signature {
+  font-size: 10px;
+  color: #5b6e8c;
 }
 
-.badge {
-  padding: 4px 12px;
-  border-radius: 40px;
-  font-size: 12px;
-  font-weight: 600;
+.aadhar-signature {
+  font-style: italic;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 4px;
 }
 
-.super-admin {
-  background: #e8f0ff;
-  color: var(--primary);
+/* =============================================
+   AADHAR STYLE FOR PIE CHART CARD (RIGHT)
+   ============================================= */
+.pie-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #d4dcec;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.active {
-  background: #e0faf3;
-  color: var(--success);
+.pie-card .aadhar-header {
+  background: linear-gradient(90deg, #1e3a5f 0%, #2a5090 100%);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: white;
 }
 
-/* DONUT CHART */
+.pie-card-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Donut container – centered group */
 .donut-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 32px;
   flex-wrap: wrap;
-  gap: 20px;
+  width: 100%;
+}
+
+.donut-container svg {
+  flex-shrink: 0;
 }
 
 .donut-legend {
-  flex: 1;
+  min-width: 120px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -493,19 +614,120 @@ body {
   align-items: center;
   gap: 12px;
   font-size: 14px;
+  justify-content: space-between;
 }
 
 .legend-dot {
   width: 12px;
   height: 12px;
   border-radius: 4px;
+  flex-shrink: 0;
 }
 
 .legend-item strong {
   margin-left: auto;
+  font-weight: 700;
 }
 
-/* RESPONSIVE */
+/* =============================================
+   ANIMATIONS
+   ============================================= */
+.animated-aadhar {
+  animation: cardFloatUp 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-aadhar:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+}
+
+.animated-aadhar::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%);
+  opacity: 0;
+  transform: rotate(25deg);
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.animated-aadhar:hover::after {
+  opacity: 1;
+  animation: shineFlash 0.6s ease-out;
+}
+
+@keyframes cardFloatUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shineFlash {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(100%) rotate(25deg); }
+}
+
+.animated-avatar {
+  animation: avatarPop 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) 0.2s both;
+}
+
+@keyframes avatarPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  80% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animated-detail {
+  opacity: 0;
+  animation: slideFadeUp 0.35s ease forwards;
+}
+
+@keyframes slideFadeUp {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Staggered scale pop for each segment */
+.animated-donut-segment {
+  opacity: 0;
+  transform: scale(0);
+  animation: popDonut 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+}
+
+@keyframes popDonut {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animated-legend .legend-item {
+  opacity: 0;
+  animation: fadeSlideRight 0.4s ease forwards;
+}
+
+@keyframes fadeSlideRight {
+  0% { opacity: 0; transform: translateX(-12px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
 @media (max-width: 1000px) {
   .two-columns {
     grid-template-columns: 1fr;
@@ -518,6 +740,25 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .donut-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .donut-legend {
+    width: 100%;
+    align-items: flex-start;
+  }
+  .aadhar-details {
+    grid-template-columns: 1fr;
+  }
+  .aadhar-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 @media (max-width: 640px) {
   .stats-grid {
     grid-template-columns: 1fr;
@@ -526,11 +767,15 @@ body {
     flex-direction: column;
     text-align: center;
   }
-  .donut-container {
+  .aadhar-body {
     flex-direction: column;
     align-items: center;
+    text-align: center;
   }
-  .donut-legend {
+  .aadhar-details {
     width: 100%;
+  }
+  .detail-group {
+    text-align: left;
   }
 }
