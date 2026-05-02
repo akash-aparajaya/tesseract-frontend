@@ -1,7 +1,12 @@
-export default function PageLoader() {
+import React from "react";
+import "../../styles/Loader.css";
+
+const Loader: React.FC = () => {
   return (
-    <div className="page-loader">
-      <div className="spinner"></div>
+    <div className="fullscreen-loader">
+      <div className="multi-dot-loader"></div>
     </div>
   );
-}
+};
+
+export default Loader;

@@ -1,55 +1,46 @@
-/* Your custom animation logic */
-.loader {
-  width: 40px;
-  aspect-ratio: 1;
-  color: #f03355;
-  position: relative;
-  background:
-    conic-gradient(from 134deg at top, currentColor 92deg, #0000 0) top,
-    conic-gradient(from -46deg at bottom, currentColor 92deg, #0000 0) bottom;
-  background-size: 100% 50%;
-  background-repeat: no-repeat;
-}
-
-.loader:before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  --g: currentColor 14.5px, #0000 0 calc(100% - 14.5px), currentColor 0;
-  background:
-    linear-gradient(45deg, var(--g)),
-    linear-gradient(-45deg, var(--g));
-  animation: l7 1.5s infinite cubic-bezier(0.3, 1, 0, 1);
-}
-
-@keyframes l7 {
-  33% { inset: -10px; transform: rotate(0deg); }
-  66% { inset: -10px; transform: rotate(90deg); }
-  100% { inset: 0; transform: rotate(90deg); }
-}
-
-/* Container Styles */
-.loader-overlay {
+/* Full‑screen overlay */
+.fullscreen-loader {
   position: fixed;
-  inset: 0;
-  background: rgba(17, 24, 39, 0.9); /* Dark background */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(5px);
 }
 
-.loader-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+/* Multi‑color rotating dots loader (your exact animation) */
+.multi-dot-loader {
+  height: 20px;
+  aspect-ratio: 4;
+  display: grid;
 }
 
-.loader-text {
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+.multi-dot-loader:before,
+.multi-dot-loader:after {
+  content: "";
+  grid-area: 1/1;
+  --_g: no-repeat radial-gradient(farthest-side, #00e5ff 94%, #0000),
+        no-repeat radial-gradient(farthest-side, #aa55ff 94%, #0000);
+  background: var(--_g) left, var(--_g) right;
+  background-size: 25% 100%;
+  animation: spinMove 1s infinite;
+  transform: translate(var(--d, 0)) rotate(0);
+}
+
+.multi-dot-loader:after {
+  --_g: no-repeat radial-gradient(farthest-side, #ffaa00 94%, #0000),
+        no-repeat radial-gradient(farthest-side, #ff0055 94%, #0000);
+  --d: 37.5%;
+  animation-delay: 0.5s;
+}
+
+@keyframes spinMove {
+  50%, 100% {
+    transform: translate(var(--d, 0)) rotate(0.5turn);
+  }
 }

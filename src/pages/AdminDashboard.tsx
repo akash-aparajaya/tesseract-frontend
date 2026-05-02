@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/AdminPanel.css';
 import { useToast } from '../hooks/useToast'; // adjust path
 import { getAllAdminApi, activateOrDeactivateAdminApi, createAdminApi, changePasswordApi } from '../services/adminApi'; // adjust import
-
+import Loader from '@/components/common/Loader';
 interface User {
   id: number;
   name: string;
@@ -135,8 +135,9 @@ const AdminPanelContent: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="admin-content"><div className="loading-screen">Loading users...</div></div>;
+     return <Loader />;
   }
+
 
   return (
     <>

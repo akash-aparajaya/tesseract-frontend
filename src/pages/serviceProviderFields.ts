@@ -1,4 +1,11 @@
-import { ProviderField } from "./types";
+
+export interface ProviderField {
+    name: string;
+    label: string;
+    type: string;
+    required: boolean;
+    icon: string;
+}
 
 export const SMS_PROVIDER_FIELDS: Record<string, ProviderField[]> = {
     MSG91: [

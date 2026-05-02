@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import "../styles/dashboard.css";
 import { useToast } from "../hooks/useToast";
 import { getUserApi } from "../services/authApi";
+import Loader from "@/components/common/Loader";
 
 const TesseractDashboard: React.FC = () => {
   // 📢 Toast notifications hook
@@ -131,7 +132,7 @@ const TesseractDashboard: React.FC = () => {
 
   // ⏳ Loading screen while data is being fetched
   if (loading) {
-    return <div className="loading-screen">Loading dashboard...</div>;
+     return <Loader />;
   }
 
   return (
