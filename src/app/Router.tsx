@@ -1,25 +1,19 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
 import Layout from "../components/Layout";
 import Login from "../pages/login";
 import Dashboard from "../pages/selfDashboard";
-
 import ProjectDashboard from "../pages/ProjectDashboard";
 import ProjectCreateForm from "../pages/ProjectCreateForm";
 import ProjectView from "../pages/ProjectView";
-
 import AdminDashboard from "../pages/AdminDashboard";
 import AdminCreate from "../pages/AdminCreate";
-
 import ForgotPassword from "@/pages/ForgotPassword";
 import ProjectEditForm from "@/pages/ProjectEditForm";
-import ServiceProviderConfig from "@/pages/ServiceProviderConfig";
 import ProjectEdit from "@/pages/ProjectEdit";
 import EnvironmentManagement from "@/pages/EnvironmentManagement";
-
+import ProviderConfig from "@/pages/ProviderConfig";
 
 const router = createBrowserRouter([
-  // ================= LOGIN =================
   {
     path: "/",
     element: <Login />,
@@ -28,8 +22,6 @@ const router = createBrowserRouter([
     path: "/forgot-password/:token",
     element: <ForgotPassword />,
   },
-
-  // ================= DASHBOARD LAYOUT =================
   {
     path: "/dashboard",
     element: <Layout />,
@@ -38,8 +30,6 @@ const router = createBrowserRouter([
         index: true,
         element: <Dashboard />,
       },
-
-      // ================= ADMIN =================
       {
         path: "admin",
         element: <AdminDashboard />,
@@ -48,18 +38,6 @@ const router = createBrowserRouter([
         path: "admin-create",
         element: <AdminCreate />,
       },
-
-      // ================= SERVICE =================
-      // {
-      //   path: "service",
-      //   element: <ServiceDashboard />,
-      // },
-      // {
-      //   path: "service-create",
-      //   element: <ServiceCreate />,
-      // },
-
-      // ================= PROJECT =================
       {
         path: "project",
         element: <ProjectDashboard />,
@@ -80,14 +58,15 @@ const router = createBrowserRouter([
         path: "project/:projectId/logs",
         element: <ProjectView />,
       },
+      // Environment routes
       {
-        path: "environments/:projectId",
+        path: "environments",
         element: <EnvironmentManagement />,
       },
       {
-        path: "service-config/:projectId",
-        element: <ServiceProviderConfig />,
-      }
+        path: "provider-config/:environmentName",
+        element: <ProviderConfig />,
+      },
     ],
   },
 ]);

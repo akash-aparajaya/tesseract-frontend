@@ -38,7 +38,10 @@ export default function ProjectDashboard() {
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
   const [editForm, setEditForm] = useState({ name: "", description: "", status: "", services: [] as string[] });
-
+  const handleManageEnvironments = (project: Project) => {
+    localStorage.setItem('currentProject', JSON.stringify(project));
+    navigate(`/dashboard/environments/${project.id}`);
+  };
   // Filter & Pagination
   const filteredProjects = projects.filter(p =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,9 +73,7 @@ export default function ProjectDashboard() {
 
 
   // Navigate to service configuration page
-  const handleConfigureServices = (project: Project) => {
-    navigate(`/dashboard/service-config/${project.id}`, { state: { project } });
-  };
+
 
   const activeCount = projects.filter(p => p.status === "active").length;
   const inactiveCount = projects.length - activeCount;
@@ -135,13 +136,21 @@ export default function ProjectDashboard() {
                     <div className="actions-dropdown">
                       <button className="three-dots">⋮</button>
                       <div className="dropdown-menu">
-                        <div className="dropdown-item" onClick={() => handleView(project)}>👁️ View</div>
-                        <div className="dropdown-item" onClick={() => navigate(`/dashboard/project-edit-basic/${project.id}`, { state: { project } })}>✏️ Edit</div>
-                        <div className="dropdown-item" onClick={() => navigate(`/dashboard/environments/${project.id}`, { state: { project, environmentName: null } })}>
-                          🌍 Manage Environments
-                        </div>         <div className="dropdown-item delete" onClick={() => setShowDeleteConfirm(project.id)}>🗑️ Delete</div>
+                        <div className="dropdown-item" onClick={() => handleView(project)}>
+                          👁️ View
+                        </div>
+                        <div className="dropdown-item" onClick={() => navigate(`/dashboard/project-edit-basic/${project.id}`, { state: { project } })}>
+                          ✏️ Edit
+                        </div>
+                        <div className="dropdown-item" onClick={() => navigate("/dashboard/environments", { state: { project } })}>
+                          🌍 Environments
+                        </div>
+                        <div className="dropdown-item delete" onClick={() => setShowDeleteConfirm(project.id)}>
+                          🗑️ Delete
+                        </div>
                       </div>
                     </div>
+
                   </td>
                 </tr>
               ))
