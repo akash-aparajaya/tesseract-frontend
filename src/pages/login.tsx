@@ -6,6 +6,7 @@ import logo from "../assets/logo.svg";
 import { loginUser, forgotPasswordApi } from "../services/authApi";
 import { FormState, Errors } from "../types/login.type";
 import { useToast } from "../hooks/useToast"; // adjust path if needed
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   const [form, setForm] = useState<FormState>({ email: "", password: "" });
@@ -123,7 +124,7 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
-                  {showPassword ? "🙈" : "👁️"}
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
               {errors.password && <span className="error-text">{errors.password}</span>}

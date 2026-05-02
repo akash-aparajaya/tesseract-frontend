@@ -7,7 +7,6 @@ import logo from "../assets/logo.svg";
 import dashboardIcon from "../assets/sidebarLogos/dashboard.png";
 import adminIcon from "../assets/sidebarLogos/user-setting.png";
 import projectIcon from "../assets/sidebarLogos/backlog.png";
-import service from "../assets/sidebarLogos/service.png";
 import logOut from "../assets/sidebarLogos/log-out.png";
 
 interface DecodedToken {
@@ -75,7 +74,7 @@ export default function Sidebar() {
 
           {/* Admin */}
 
-          {role && role.role=== "SUPER_ADMIN" && (
+          {role && role.role === "SUPER_ADMIN" && (
             <NavLink
               to="/dashboard/admin"
               className={({ isActive }) =>
@@ -93,82 +92,24 @@ export default function Sidebar() {
             </NavLink>
           )}
 
-          {/* <div className="menu-group">
-            <div
-              className={`menu-item ${openMenu === "admin" ? "active" : ""}`}
-              onClick={() => toggle("admin")}
-            >
-              <div className="sidebar-link">
-                <div className="link-content">
-                  <img src={adminIcon} className="sideBar-logo" alt="" />
-                  <span style={{ fontSize: "14px", fontWeight: 500 }}>
-                    Admin
-                  </span>
-                </div>
-                <span>{openMenu === "admin" ? "⏶" : "⏷"}</span>
-              </div>
-            </div>
 
-            <div className={`dropdown-container ${openMenu === "admin" ? "open" : ""}`}>
-              <NavLink to="/dashboard/admin" className="dropdown-item">
-                Admin Dashboard
-              </NavLink>
-              <NavLink to="/dashboard/admin-create" className="dropdown-item">
-                Admin Creation
-              </NavLink>
-            </div>
-          </div> */}
+          {/* Project */}
 
-          {/* Service */}
           <NavLink
-            to="/dashboard/service"
+            to="/dashboard/project"
             className={({ isActive }) =>
               `menu-item ${isActive ? "active" : ""}`
             }
           >
             <div className="sidebar-link">
               <div className="link-content">
-                <img src={service} className="sideBar-logo" alt="" />
+                <img src={projectIcon} className="sideBar-logo" alt="" />
                 <span style={{ fontSize: "14px", fontWeight: 500 }}>
-                  Service
+                  Project
                 </span>
               </div>
             </div>
           </NavLink>
-
-          {/* Project */}
-          <div className="menu-group">
-            <div
-              className={`menu-item ${openMenu === "project" ? "active" : ""}`}
-              onClick={() => toggle("project")}
-            >
-              <div className="sidebar-link">
-                <div className="link-content">
-                  <img src={projectIcon} className="sideBar-logo" alt="" />
-                  <span style={{ fontSize: "14px", fontWeight: 500 }}>
-                    Project
-                  </span>
-                </div>
-                <span>{openMenu === "project" ? "⏶" : "⏷"}</span>
-              </div>
-            </div>
-
-            <div
-              className={`dropdown-container ${openMenu === "project" ? "open" : ""}`}
-            >
-              <NavLink
-                to="/dashboard/project"
-                className={({ isActive }) =>
-                  `dropdown-item ${isActive ? "active-child" : ""}`
-                }
-              >
-                Project Dashboard
-              </NavLink>
-              {/* <NavLink to="/dashboard/project-create" className="dropdown-item">
-                Project creation
-              </NavLink> */}
-            </div>
-          </div>
         </div>
 
         {/* Logout */}

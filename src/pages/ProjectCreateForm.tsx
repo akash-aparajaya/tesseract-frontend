@@ -3,81 +3,51 @@ import { useNavigate } from "react-router-dom";
 import { createProject } from "../services/projectApi";
 import { useToast } from "../hooks/useToast";
 
-const AVAILABLE_SERVICES = ["SMS", "EMAIL"];
 
 export default function ProjectCreateForm() {
   const navigate = useNavigate();
+  const { showToast, ToastContainer } = useToast();
 
   const [formData, setFormData] = useState({
     project_name: "",
     project_description: "",
-    isActive: true,
-    services: [] as string[],
   });
 
-  const { toast, showToast } = useToast();
 
-  /* =========================================================
-     HANDLE SERVICE SELECT
-     ========================================================= */
-  const handleServiceChange = (service: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      services: prev.services.includes(service)
-        ? prev.services.filter((s) => s !== service)
-        : [...prev.services, service],
-    }));
-  };
-
-  /* =========================================================
-     SUBMIT FORM
-     ========================================================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.services.length === 0) {
-      showToast("Please select at least one service", "error");
-      return;
-    }
+
+    // ✅ Payload matches what your backend expects (same as the old modal)
+    const payload = {
+      project_name: formData.project_name,
+      project_description: formData.project_description,
+      isActive: true,
+
+    };
 
     try {
-      const res = await createProject(formData);
-
+      const res = await createProject(payload);
       if (res?.data?.success) {
         showToast("Project created successfully!", "success");
-
-        // ✅ FIXED NAVIGATION
-        setTimeout(() => {
-          navigate("/dashboard/project");
-        }, 1500);
+        setTimeout(() => navigate("/dashboard/project"), 1500);
       }
     } catch (error: unknown) {
-      // ✅ FIXED TYPE (no 'any')
-      if (error instanceof Error) {
-        showToast(error.message, "error");
-      } else {
-        showToast("Error creating project", "error");
-      }
+      showToast(error instanceof Error ? error.message : "Error creating project", "error");
     }
   };
 
-  /* =========================================================
-     UI
-     ========================================================= */
-  return (
-    <div className="form-container">
-      {toast.show && (
-        <div className={`toast-banner toast-${toast.type}`}>
-          {toast.message}
-        </div>
-      )}
 
+  return (
+
+    <div className="form-container">
+      <ToastContainer />
       <h2>Create New Project</h2>
 
       <form onSubmit={handleSubmit}>
         {/* Project Name */}
         <div className="form-group">
-          <label>Project Name</label>
+          <label>Project Name *</label>
           <input
             type="text"
             placeholder="Enter project name"
@@ -105,27 +75,7 @@ export default function ProjectCreateForm() {
           />
         </div>
 
-        {/* Services */}
-        <div className="form-group">
-          <label>Services *</label>
 
-          <div className="services-grid">
-            {AVAILABLE_SERVICES.map((service) => (
-              <div
-                key={service}
-                className="checkbox-item"
-                onClick={() => handleServiceChange(service)}
-              >
-                <input
-                  type="checkbox"
-                  checked={formData.services.includes(service)}
-                  readOnly
-                />
-                <label>{service}</label>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Actions */}
         <div className="form-actions">

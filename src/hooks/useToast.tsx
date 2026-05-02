@@ -4,6 +4,7 @@ import Toast from "../components/common/Toast";
 export interface ToastMessage {
   id: number;
   message: string;
+  toast: any;
   type: "success" | "error";
 }
 
@@ -12,7 +13,7 @@ export const useToast = () => {
 
   const showToast = useCallback((message: string, type: "success" | "error") => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, message, type, toast: null }]);
   }, []); // No dependencies needed because setToasts is stable
 
   const removeToast = useCallback((id: number) => {

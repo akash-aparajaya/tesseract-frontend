@@ -11,9 +11,11 @@ import ProjectView from "../pages/ProjectView";
 import AdminDashboard from "../pages/AdminDashboard";
 import AdminCreate from "../pages/AdminCreate";
 
-import ServiceDashboard from "../pages/ServiceDashboard";
-import ServiceCreate from "../pages/ServiceCreation";
 import ForgotPassword from "@/pages/ForgotPassword";
+import ProjectEditForm from "@/pages/ProjectEditForm";
+import ServiceProviderConfig from "@/pages/ServiceProviderConfig";
+import ProjectEdit from "@/pages/ProjectEdit";
+import EnvironmentManagement from "@/pages/EnvironmentManagement";
 
 
 const router = createBrowserRouter([
@@ -48,14 +50,14 @@ const router = createBrowserRouter([
       },
 
       // ================= SERVICE =================
-      {
-        path: "service",
-        element: <ServiceDashboard />,
-      },
-      {
-        path: "service-create",
-        element: <ServiceCreate />,
-      },
+      // {
+      //   path: "service",
+      //   element: <ServiceDashboard />,
+      // },
+      // {
+      //   path: "service-create",
+      //   element: <ServiceCreate />,
+      // },
 
       // ================= PROJECT =================
       {
@@ -67,9 +69,25 @@ const router = createBrowserRouter([
         element: <ProjectCreateForm />,
       },
       {
-        path: "project/:projectId/logs",          // ✅ new route
+        path: "project-edit/:projectId",
+        element: <ProjectEditForm />,
+      },
+      {
+        path: "project-edit-basic/:projectId",
+        element: <ProjectEdit />,
+      },
+      {
+        path: "project/:projectId/logs",
         element: <ProjectView />,
       },
+      {
+        path: "environments/:projectId",
+        element: <EnvironmentManagement />,
+      },
+      {
+        path: "service-config/:projectId",
+        element: <ServiceProviderConfig />,
+      }
     ],
   },
 ]);
