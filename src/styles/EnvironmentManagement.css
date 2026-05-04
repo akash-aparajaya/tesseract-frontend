@@ -1557,3 +1557,261 @@
 .provider-view-card.accordion-card .provider-view-header {
     user-select: none;
 }
+
+/* 3-dot menu */
+.env-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.env-card-menu {
+    margin-left: auto;
+    position: relative;
+}
+
+.menu-dots-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.menu-dots-btn:hover {
+    background: #f1f5f9;
+    color: var(--text-dark);
+}
+
+.menu-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    min-width: 180px;
+    animation: fadeIn 0.2s ease;
+}
+
+.menu-dropdown button {
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 13px;
+    color: var(--text-dark);
+    transition: background 0.2s;
+}
+
+.menu-dropdown button:hover {
+    background: #f1f5f9;
+}
+
+/* Clone button in ProviderConfig header */
+.clone-env-btn {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dark);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.clone-env-btn:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.config-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Clone Modal */
+.clone-modal {
+    width: 90%;
+    max-width: 500px;
+}
+
+.clone-source-info {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.clone-source-info label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.clone-source-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+/* ==========================================
+   ILLUSTRATION STYLES
+   ========================================== */
+
+.illustration-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.illustration-main {
+    font-size: 80px;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+}
+
+.illustration-services {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.illustration-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.illustration-badge:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.illustration-badge:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+.illustration-badge.sms {
+    background: #e6f9f3;
+}
+
+.illustration-badge.email {
+    background: #e8f0fe;
+}
+
+.illustration-badge.whatsapp {
+    background: #e6fbf0;
+}
+
+/* ==========================================
+   CLONE MODAL STYLES
+   ========================================== */
+
+.clone-modal {
+    width: 90%;
+    max-width: 500px;
+}
+
+.clone-source-info {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.clone-source-info label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.clone-source-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+/* ==========================================
+   CLONE BUTTON IN PROVIDER CONFIG
+   ========================================== */
+
+.clone-env-btn {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dark);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.clone-env-btn:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.env-card-layout {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.env-illustration-side {
+    flex-shrink: 0;
+}
+
+.env-form-side {
+    flex: 1;
+    text-align: left;
+}
+
+@media (max-width: 600px) {
+    .env-card-layout {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .env-form-side {
+        text-align: center;
+    }
+}

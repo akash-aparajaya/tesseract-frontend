@@ -132,6 +132,11 @@ interface Provider {
 }
 
 export default function ProviderConfig() {
+    // Clone modal states
+    const [showCloneModal, setShowCloneModal] = useState(false);
+    const [cloneTarget, setCloneTarget] = useState<string>("");
+    const [cloneCustomMode, setCloneCustomMode] = useState(false);
+    const [cloneCustomName, setCloneCustomName] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
     const { project, environmentName, activeService: initialService } = location.state || {};
@@ -350,6 +355,116 @@ export default function ProviderConfig() {
 
     if (isLoading) return <div className="loading">Loading...</div>;
 
+
+    const cloneCurrentEnvironment = () => {
+        const cloneName = `${environmentName}_copy`;
+        const services = ['sms', 'email', 'whatsapp'];
+        let hasProviders = false;
+
+        services.forEach(service => {
+            const sourceKey = `env_${environmentName}_${service}_providers`;
+            const sourceData = localStorage.getItem(sourceKey);
+            if (sourceData) {
+                const parsed = JSON.parse(sourceData);
+                if (parsed.providers?.length > 0) {
+                    hasProviders = true;
+                    const destKey = `env_${cloneName}_${service}_providers`;
+                    localStorage.setItem(destKey, JSON.stringify({
+                        ...parsed,
+                        timestamp: Date.now()
+                    }));
+                }
+            }
+        });
+
+        if (hasProviders) {
+            // Dispatch event to update environment page
+            window.dispatchEvent(new CustomEvent('providerCountsUpdated'));
+            showToast(`Environment cloned to "${cloneName}"!`, "success");
+
+            // Navigate to the cloned environment
+            setTimeout(() => {
+                navigate(`/dashboard/provider-config/${cloneName}`, {
+                    state: { project, environmentName: cloneName, activeService }
+                });
+            }, 500);
+        }
+    };
+
+    const getAvailableTargetEnvs = () => {
+        const presetEnvs = ['Local', 'Dev', 'Staging', 'Live'];
+        const allKeys = Object.keys(localStorage);
+        const configuredEnvs = new Set<string>();
+
+        allKeys.forEach(key => {
+            const match = key.match(/^env_(.+)_(sms|email|whatsapp)_providers$/);
+            if (match) {
+                const data = JSON.parse(localStorage.getItem(key) || '{"providers":[]}');
+                if (data.providers?.length > 0) {
+                    configuredEnvs.add(match[1]);
+                }
+            }
+        });
+
+        return presetEnvs.filter(env => !configuredEnvs.has(env));
+    };
+
+    const executeClone = () => {
+        let targetName = cloneTarget;
+
+        if (cloneCustomMode && cloneCustomName.trim()) {
+            targetName = cloneCustomName.trim();
+        }
+
+        if (!targetName) {
+            showToast("Please select or enter a target environment", "error");
+            return;
+        }
+
+        const services = ['sms', 'email', 'whatsapp'];
+        let hasProviders = false;
+
+        services.forEach(service => {
+            const sourceKey = `env_${environmentName}_${service}_providers`;
+            const sourceData = localStorage.getItem(sourceKey);
+            if (sourceData) {
+                const parsed = JSON.parse(sourceData);
+                if (parsed.providers?.length > 0) {
+                    hasProviders = true;
+                    const destKey = `env_${targetName}_${service}_providers`;
+                    localStorage.setItem(destKey, JSON.stringify({
+                        ...parsed,
+                        timestamp: Date.now()
+                    }));
+                }
+            }
+        });
+
+        if (hasProviders) {
+            window.dispatchEvent(new CustomEvent('providerCountsUpdated'));
+            showToast(`Environment cloned to "${targetName}"!`, "success");
+            setShowCloneModal(false);
+
+            setTimeout(() => {
+                navigate(`/dashboard/provider-config/${targetName}`, {
+                    state: { project, environmentName: targetName, activeService }
+                });
+            }, 500);
+        }
+    };
+
+    const handleCloneTargetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        if (value === "__custom__") {
+            setCloneCustomMode(true);
+            setCloneTarget("");
+        } else {
+            setCloneCustomMode(false);
+            setCloneTarget(value);
+        }
+    };
+
+
     return (
         <div className="provider-config-container">
             <ToastContainer />
@@ -359,6 +474,21 @@ export default function ProviderConfig() {
                     <h2>{project?.name} - {environmentName}</h2>
                     <p>Configure providers for this environment</p>
                 </div>
+                {/* Only show clone button if there are providers in any service */}
+                {Object.values(serviceProviderCounts).some(count => count > 0) && (
+                    <button
+                        className="clone-env-btn"
+                        onClick={() => {
+                            setCloneTarget("");
+                            setCloneCustomMode(false);
+                            setCloneCustomName("");
+                            setShowCloneModal(true);
+                        }}
+                        title="Clone this environment"
+                    >
+                        📋 Clone
+                    </button>
+                )}
             </div>
 
             <div className="config-content">
@@ -660,6 +790,64 @@ export default function ProviderConfig() {
                             </button>
                             <button className="btn-delete" onClick={confirmCancel}>
                                 Discard Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Clone Modal */}
+            {showCloneModal && (
+                <div className="modal-overlay" onClick={() => setShowCloneModal(false)}>
+                    <div className="modal-container clone-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>📋 Clone Environment</h3>
+                            <button className="close-btn" onClick={() => setShowCloneModal(false)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="clone-source-info">
+                                <label>Source Environment</label>
+                                <div className="clone-source-name">🌍 {environmentName}</div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Select Target Environment</label>
+                                <select
+                                    className="provider-select"
+                                    value={cloneCustomMode ? "__custom__" : cloneTarget}
+                                    onChange={handleCloneTargetChange}
+                                >
+                                    <option value="">-- Select target --</option>
+                                    {getAvailableTargetEnvs().map(env => (
+                                        <option key={env} value={env}>{env}</option>
+                                    ))}
+                                    <option value="__custom__">+ Custom Environment</option>
+                                </select>
+                            </div>
+
+                            {cloneCustomMode && (
+                                <div className="form-group">
+                                    <label>Custom Environment Name</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter environment name"
+                                        value={cloneCustomName}
+                                        onChange={(e) => setCloneCustomName(e.target.value)}
+                                        className="custom-input-small"
+                                        autoFocus
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <div className="modal-actions">
+                            <button className="btn-cancel" onClick={() => setShowCloneModal(false)}>
+                                Cancel
+                            </button>
+                            <button
+                                className="btn-create"
+                                onClick={executeClone}
+                                disabled={!cloneTarget && !cloneCustomName.trim()}
+                            >
+                                Clone Environment
                             </button>
                         </div>
                     </div>
