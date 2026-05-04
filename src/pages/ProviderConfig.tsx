@@ -345,9 +345,7 @@ export default function ProviderConfig() {
         showToast("Provider creation cancelled", "success");
     };
 
-    const handleFinalSave = async () => {
-        showToast(`Configuration saved for ${environmentName}!`, "success");
-    };
+
 
     if (!project || !environmentName) {
         return <div className="loading">Loading...</div>;
@@ -355,41 +353,6 @@ export default function ProviderConfig() {
 
     if (isLoading) return <div className="loading">Loading...</div>;
 
-
-    const cloneCurrentEnvironment = () => {
-        const cloneName = `${environmentName}_copy`;
-        const services = ['sms', 'email', 'whatsapp'];
-        let hasProviders = false;
-
-        services.forEach(service => {
-            const sourceKey = `env_${environmentName}_${service}_providers`;
-            const sourceData = localStorage.getItem(sourceKey);
-            if (sourceData) {
-                const parsed = JSON.parse(sourceData);
-                if (parsed.providers?.length > 0) {
-                    hasProviders = true;
-                    const destKey = `env_${cloneName}_${service}_providers`;
-                    localStorage.setItem(destKey, JSON.stringify({
-                        ...parsed,
-                        timestamp: Date.now()
-                    }));
-                }
-            }
-        });
-
-        if (hasProviders) {
-            // Dispatch event to update environment page
-            window.dispatchEvent(new CustomEvent('providerCountsUpdated'));
-            showToast(`Environment cloned to "${cloneName}"!`, "success");
-
-            // Navigate to the cloned environment
-            setTimeout(() => {
-                navigate(`/dashboard/provider-config/${cloneName}`, {
-                    state: { project, environmentName: cloneName, activeService }
-                });
-            }, 500);
-        }
-    };
 
     const getAvailableTargetEnvs = () => {
         const presetEnvs = ['Local', 'Dev', 'Staging', 'Live'];
@@ -654,18 +617,7 @@ export default function ProviderConfig() {
                         )}
                     </div>
 
-                    <div className="panel-actions">
-                        <button className="btn-cancel" onClick={() => navigate(-1)}>
-                            Cancel
-                        </button>
-                        <button
-                            className="btn-submit"
-                            onClick={handleFinalSave}
-                            style={{ background: `linear-gradient(135deg, ${SERVICE_COLORS[activeService]}, #2563eb)` }}
-                        >
-                            Save Configuration
-                        </button>
-                    </div>
+
                 </div>
             </div>
 
