@@ -27,3 +27,8 @@ export const resetPasswordApi = (data: { token: string; password: string }) => {
 export const getUserApi = () => {
   return api.get("/users/get-users");
 };
+
+//health check API
+export const healthCheckApi = () => {
+  return api.get("/health");
+};

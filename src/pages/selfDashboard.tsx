@@ -90,7 +90,7 @@ const TesseractDashboard: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);

@@ -1,5 +1,5 @@
 /* =============================================
-   GLOBAL VARIABLES & RESET
+   GLOBAL VARIABLES & RESET (keep as is)
    ============================================= */
 :root {
   --primary-dark: #1e3a5f;
@@ -30,14 +30,15 @@ body {
   color: var(--text-dark);
 }
 
+/* 🔥 FIX: removed double padding – rely on Layout's main padding */
 .dashboard {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 0;                 /* was 24px – causes double spacing */
 }
 
 /* =============================================
-   HERO SECTION (original)
+   HERO SECTION
    ============================================= */
 .hero {
   background: linear-gradient(120deg, #0f1f38 0%, var(--primary-dark) 45%, #2a5090 100%);
@@ -54,6 +55,7 @@ body {
   overflow: hidden;
 }
 
+/* ... rest of hero styles stay same ... */
 .hero::before {
   content: '';
   position: absolute;
@@ -78,7 +80,7 @@ body {
 }
 
 .hero-time {
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 800;
   letter-spacing: -1px;
   font-family: 'Syne', monospace;
@@ -138,12 +140,12 @@ body {
 }
 
 /* =============================================
-   STATS CARDS (original)
+   STATS CARDS – increased gap
    ============================================= */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
+  gap: 24px;           /* was 20px – more breathing room */
   margin-bottom: 32px;
 }
 
@@ -195,12 +197,12 @@ body {
 }
 
 /* =============================================
-   TWO COLUMN LAYOUT
+   TWO COLUMN LAYOUT – increased gap
    ============================================= */
 .two-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 28px;           /* was 24px – better separation */
   align-items: stretch;
 }
 
@@ -210,7 +212,7 @@ body {
 }
 
 /* =============================================
-   CARD BASE STYLES (both columns)
+   CARD BASE STYLES – consistent padding inside
    ============================================= */
 .aadhar-card,
 .pie-card {
@@ -226,7 +228,7 @@ body {
   position: relative;
 }
 
-/* Unified card entrance animation */
+/* ... keep all existing animations (cardReveal, shine, etc.) ... */
 .left-col .aadhar-card,
 .right-col .pie-card {
   animation: cardReveal 0.7s cubic-bezier(0.21, 1.11, 0.36, 1) forwards;
@@ -242,7 +244,6 @@ body {
 .left-col .aadhar-card { animation-delay: 0.05s; }
 .right-col .pie-card { animation-delay: 0.1s; }
 
-/* 3D tilt only for left card */
 .left-col .aadhar-card {
   transform-style: preserve-3d;
   perspective: 800px;
@@ -252,13 +253,12 @@ body {
   box-shadow: 0 30px 40px -20px rgba(0, 0, 0, 0.25);
 }
 
-/* Right card hover – simple lift */
 .right-col .pie-card:hover {
   transform: translateY(-6px) scale(1.01);
   box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
 }
 
-/* Shine effect on hover (both cards) */
+/* Shine effect */
 .aadhar-card::after,
 .pie-card::after {
   content: '';
@@ -314,7 +314,7 @@ body {
 .aadhar-body-row {
   display: flex;
   gap: 24px;
-  padding: 20px;
+  padding: 24px;        /* was 20px – more internal spacing */
   flex-wrap: wrap;
   border-bottom: 1px dashed #e2e8f0;
   flex: 1;
@@ -357,12 +357,12 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 20px;            /* was 16px – more breathing room */
 }
 
 .detail-item {
   border-bottom: 1px dotted #eef2f8;
-  padding-bottom: 6px;
+  padding-bottom: 8px;  /* was 6px */
   opacity: 0;
   animation: slideGlowIn 0.4s ease forwards;
 }
@@ -386,7 +386,7 @@ body {
   font-weight: 700;
   color: #6c7a91;
   letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .detail-item p {
@@ -409,7 +409,6 @@ body {
   color: #00c896;
   font-weight: 600;
   animation: gentleGlow 2s infinite;
-      width: 90px;
 }
 
 @keyframes gentleGlow {
@@ -419,6 +418,10 @@ body {
 }
 
 .status-inactive { color: #f75f5f; }
+
+.detail-full-width {
+  grid-column: span 2;
+}
 
 .aadhar-footer {
   padding: 14px 20px;
@@ -455,7 +458,7 @@ body {
 }
 
 /* =============================================
-   SYSTEM HEALTH CARD (right)
+   SYSTEM HEALTH CARD (right) – improved interior spacing
    ============================================= */
 .pie-card .aadhar-header {
   background: linear-gradient(90deg, #1e3a5f 0%, #2a5090 100%);
@@ -471,8 +474,8 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  padding: 20px;
+  gap: 24px;          /* was 20px */
+  padding: 24px;      /* was 20px */
   flex-wrap: wrap;
   flex: 1;
 }
@@ -484,7 +487,7 @@ body {
 .donut-legend-row {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;          /* was 12px */
   min-width: 100px;
 }
 
@@ -517,16 +520,16 @@ body {
 .service-cards-row-right {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;          /* was 12px */
   min-width: 130px;
 }
 
 .service-card-mini {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;          /* was 10px */
   background: #f8fafc;
-  padding: 8px 12px;
+  padding: 10px 14px; /* was 8px 12px */
   border-radius: 14px;
   border: 1px solid #eef2f8;
   transition: all 0.2s;
@@ -630,17 +633,6 @@ body {
 .aadhar-logo span:last-child { animation-delay: 0.05s; }
 .aadhar-title { animation-delay: 0.15s; }
 
-/* Hover effect on labels */
-.aadhar-logo span:last-child:hover,
-.aadhar-title:hover,
-.detail-item label:hover,
-.service-card-label-mini:hover {
-  transition: letter-spacing 0.2s ease, text-shadow 0.2s ease;
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 3px rgba(79, 142, 247, 0.3);
-}
-
-/* Icon bounce for diamond */
 .aadhar-logo span:first-child {
   display: inline-block;
   animation: iconWave 0.5s ease 0.3s both;
@@ -652,20 +644,13 @@ body {
   100% { transform: scale(1); }
 }
 
-/* Override any conflict */
-.animated-detail {
-  animation: none;
-}
-
 /* =============================================
-   RESPONSIVE
+   RESPONSIVE – adjust gaps on smaller screens
    ============================================= */
 @media (max-width: 1000px) {
   .two-columns {
     grid-template-columns: 1fr;
-  }
-  .dashboard {
-    padding: 16px;
+    gap: 24px;
   }
   .hero-time {
     font-size: 36px;
@@ -685,6 +670,9 @@ body {
   .service-cards-row-right {
     flex-direction: row;
     justify-content: center;
+  }
+  .stats-grid {
+    gap: 20px;
   }
 }
 

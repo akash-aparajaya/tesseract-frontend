@@ -7,14 +7,14 @@ export const getAllAdminApi = () => {
 
 //activate or deactivate admin API
 export const activateOrDeactivateAdminApi = (id: number, active: boolean) => {
-  return api.patch(`/admin/users/${id}/status`, {
+  return api.patch(`/users/${id}/status`, {
     active,
   });
 };
 
 //change password API
 export const changePasswordApi = (id: number, password: string) => {
-  return api.patch(`/admin/users/${id}/password`, {
+  return api.patch(`/users/${id}/password`, {
     password,
   });
 };
