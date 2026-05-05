@@ -15,13 +15,13 @@ interface DecodedToken {
 }
 
 export default function Sidebar() {
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  // const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
   const navigate = useNavigate();
 
-  const toggle = (name: string) => setOpenMenu(openMenu === name ? null : name);
+  // const toggle = (name: string) => setOpenMenu(openMenu === name ? null : name);
 
   const handleConfirmLogout = () => {
     setShowPopup(false);
