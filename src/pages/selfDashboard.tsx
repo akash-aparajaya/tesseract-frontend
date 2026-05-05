@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "../styles/dashboard.css";
 import { useToast } from "../hooks/useToast";
-import { getUserApi } from "../services/authApi";
+import { getUserApi, healthCheckApi } from "../services/authApi";
 import Loader from "@/components/common/Loader";
 
+type ServiceStatus = {
+  api: string;
+  database: string;
+  redis: string;
+};
+
 const TesseractDashboard: React.FC = () => {
-  // 📢 Toast notifications hook
   const { showToast, ToastContainer } = useToast();
 
-  // ⏰ Time state for live clock
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [bellRing, setBellRing] = useState(false); // animation trigger for notification bell
-
-  // 📊 Data states
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState({
     id: 1,
@@ -23,31 +24,32 @@ const TesseractDashboard: React.FC = () => {
     status: "Active",
   });
 
-  // Stat cards (Admins, Services, Projects)
   const [stats, setStats] = useState([
     { label: "Admins", value: 0, icon: "👥", color: "#4f8ef7", bg: "#e8f0ff" },
     { label: "Services", value: 0, icon: "⚙️", color: "#00c896", bg: "#e0faf3" },
     { label: "Projects", value: 0, icon: "📁", color: "#f5a623", bg: "#fff4e0" },
   ]);
 
-  // Distribution for donut chart (Services, Projects, Admins)
   const [distribution, setDistribution] = useState([
     { name: "Services", value: 0, color: "#00c896", percent: 0 },
     { name: "Projects", value: 0, color: "#f5a623", percent: 0 },
     { name: "Admins", value: 0, color: "#4f8ef7", percent: 0 },
   ]);
 
-  const uptime = 80; // static uptime – replace with real API if needed
+  const [uptime, setUptime] = useState<string>("0");
+  const [services, setServices] = useState<ServiceStatus>({
+    api: "unknown",
+    database: "unknown",
+    redis: "unknown",
+  });
 
-  // 🔄 Fetch all dashboard data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const profileData = await getUserApi();
-        console.log(profileData.data);
+        const healthData = await healthCheckApi();
 
-        // Set user profile
         setProfile({
           id: profileData.data.users.id,
           name: profileData.data.users.user_name,
@@ -57,14 +59,12 @@ const TesseractDashboard: React.FC = () => {
           status: profileData.data.users.is_deleted === false ? "Active" : "Inactive",
         });
 
-        // Set stats counts
         setStats([
           { label: "Admins", value: profileData.data.statsData.totalAdmins, icon: "👥", color: "#4f8ef7", bg: "#e8f0ff" },
           { label: "Services", value: profileData.data.statsData.totalServices, icon: "⚙️", color: "#00c896", bg: "#e0faf3" },
           { label: "Projects", value: profileData.data.statsData.totalActiveProjects, icon: "📁", color: "#f5a623", bg: "#fff4e0" },
         ]);
 
-        // Calculate distribution for donut chart (percentages)
         const total = profileData.data.statsData.totalServices +
                       profileData.data.statsData.totalActiveProjects +
                       profileData.data.statsData.totalAdmins;
@@ -73,6 +73,15 @@ const TesseractDashboard: React.FC = () => {
           { name: "Projects", value: profileData.data.statsData.totalActiveProjects, color: "#f5a623", percent: (profileData.data.statsData.totalActiveProjects / total) * 100 },
           { name: "Admins", value: profileData.data.statsData.totalAdmins, color: "#4f8ef7", percent: (profileData.data.statsData.totalAdmins / total) * 100 },
         ]);
+
+        setUptime(healthData?.data?. uptimeFormatted ?? "0");
+        if (healthData?.data?.services) {
+          setServices({
+            api: healthData.data.services.api || "unknown",
+            database: healthData.data.services.database || "unknown",
+            redis: healthData.data.services.redis || "unknown",
+          });
+        }
       } catch (error) {
         console.error("Dashboard API error:", error);
         showToast("Failed to load dashboard data", "error");
@@ -83,13 +92,11 @@ const TesseractDashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  // ⏱️ Live clock – updates every second
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // 🕒 Format current time as HH:MM:SS AM/PM
   const formatTime = (date: Date) => {
     let hours = date.getHours();
     const minutes = date.getMinutes();
@@ -99,7 +106,6 @@ const TesseractDashboard: React.FC = () => {
     return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")} ${ampm}`;
   };
 
-  // 📅 Format current date: Day, Month DD, YYYY · Weekday/Weekend
   const formatDate = (date: Date) => {
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -111,7 +117,6 @@ const TesseractDashboard: React.FC = () => {
     return `${dayName}, ${month} ${day}, ${year} · ${dayType}`;
   };
 
-  // 🥧 Donut chart calculations – generates stroke dasharray and offset for each segment
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
   const donutSegments = useMemo(() => {
@@ -124,48 +129,24 @@ const TesseractDashboard: React.FC = () => {
     });
   }, [distribution, circumference]);
 
-  // 🔔 Notification bell click handler with shake animation
-  const handleBellClick = () => {
-    setBellRing(true);
-    setTimeout(() => setBellRing(false), 600);
+  const getServiceStatus = (status: string) => {
+    const isConnected = status === "running" || status === "connected";
+    return {
+      color: isConnected ? "#00c896" : "#f75f5f",
+      text: isConnected ? "Connected" : "Disconnected",
+    };
   };
 
-  // ⏳ Loading screen while data is being fetched
   if (loading) {
-     return <Loader />;
+    return <Loader />;
   }
 
   return (
     <>
       <ToastContainer />
       <div className="dashboard">
-        {/* -------------------- HEADER -------------------- */}
-        <header className="dashboard-header">
-          <div className="header-left">
-            <div className="logo">
-              <div className="logo-icon">🔷</div>
-              <span className="logo-text">TESSERACT</span>
-            </div>
-            <div className="breadcrumb">
-              <span>Dashboard</span>
-              <span className="sep">/</span>
-              <span className="current">Self Dashboard</span>
-            </div>
-          </div>
-          <div className="header-right">
-            <div className="search-box">
-              <span className="search-icon">🔍</span>
-              <input type="text" placeholder="Search..." />
-            </div>
-            <div className="icon-btn notif-btn" onClick={handleBellClick}>
-              <span className={`bell-icon ${bellRing ? "ring" : ""}`}>🔔</span>
-              <span className="notif-dot"></span>
-            </div>
-            <div className="user-avatar">{profile.name.slice(0, 2)}</div>
-          </div>
-        </header>
-
-        {/* -------------------- HERO SECTION (Time & Company) -------------------- */}
+    
+        {/* Hero Section */}
         <div className="hero">
           <div className="hero-content">
             <div className="hero-time">{formatTime(currentTime)}</div>
@@ -180,7 +161,7 @@ const TesseractDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* -------------------- STATS CARDS -------------------- */}
+        {/* Stats Cards */}
         <div className="stats-grid">
           {stats.map((stat, idx) => (
             <div className="stat-card" key={idx}>
@@ -195,9 +176,9 @@ const TesseractDashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* -------------------- TWO COLUMN LAYOUT (Profile + Donut) -------------------- */}
+        {/* Two Columns - both row-aligned */}
         <div className="two-columns">
-          {/* LEFT COLUMN – Aadhar style profile card */}
+          {/* LEFT COLUMN - Profile Card (row-aligned) */}
           <div className="left-col">
             <div className="card aadhar-card animated-aadhar">
               <div className="aadhar-header">
@@ -207,44 +188,44 @@ const TesseractDashboard: React.FC = () => {
                 </div>
                 <div className="aadhar-title">IDENTITY</div>
               </div>
-              <div className="aadhar-body">
-                <div className="aadhar-avatar animated-avatar">
-                  <div className="avatar-photo">👤</div>
-                  <div className="avatar-label">Photo</div>
+              <div className="aadhar-body-row">
+                <div className="aadhar-avatar-row">
+                  <div className="avatar-photo-row">👤</div>
+                  <div className="avatar-label-row">Photo</div>
                 </div>
-                <div className="aadhar-details">
-                  <div className="detail-group animated-detail" style={{ animationDelay: '0.05s' }}>
+                <div className="profile-details-grid">
+                  <div className="detail-item">
                     <label>Name</label>
                     <p>{profile.name}</p>
                   </div>
-                  <div className="detail-group animated-detail" style={{ animationDelay: '0.1s' }}>
+                  <div className="detail-item">
                     <label>Role / Type</label>
                     <p>{profile.role}</p>
                   </div>
-                  <div className="detail-group animated-detail" style={{ animationDelay: '0.15s' }}>
+                  <div className="detail-item">
                     <label>Status</label>
                     <p className={profile.status === "Active" ? "status-active" : "status-inactive"}>
                       {profile.status === "Active" ? "● Active" : profile.status}
                     </p>
                   </div>
-                  <div className="detail-group animated-detail" style={{ animationDelay: '0.2s' }}>
+                  <div className="detail-item">
                     <label>Last Login</label>
                     <p>{profile.lastLogin || formatTime(currentTime)}</p>
                   </div>
-                  <div className="detail-group animated-detail" style={{ animationDelay: '0.25s' }}>
+                  <div className="detail-item detail-full-width">
                     <label>Email Address</label>
                     <p>{profile.email}</p>
                   </div>
                 </div>
               </div>
               <div className="aadhar-footer">
-                <div className="aadhar-id" style={{ fontWeight: "bold", fontSize: "12px",color:"darkblue" }}>Admin ID: ADI-{profile.id}</div>
+                <div className="aadhar-id">Admin ID: ADI-{profile.id}</div>
                 <div className="aadhar-signature">Authorised Signature</div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT COLUMN – Aadhar style System Overview (Donut) */}
+          {/* RIGHT COLUMN - System Health Card (row-aligned) */}
           <div className="right-col">
             <div className="card aadhar-card pie-card animated-aadhar">
               <div className="aadhar-header">
@@ -254,10 +235,10 @@ const TesseractDashboard: React.FC = () => {
                 </div>
                 <div className="aadhar-title">RESOURCE METRICS</div>
               </div>
-              <div className="pie-card-body">
-                <div className="donut-container">
-                  {/* Donut chart SVG */}
-                  <svg width="160" height="160" viewBox="0 0 140 140">
+              <div className="pie-card-body-row">
+                {/* Donut Chart */}
+                <div className="donut-chart-wrapper">
+                  <svg width="140" height="140" viewBox="0 0 140 140">
                     <circle cx="70" cy="70" r="54" fill="none" stroke="#eef1f8" strokeWidth="20" />
                     {donutSegments.map((seg, idx) => (
                       <circle
@@ -276,21 +257,46 @@ const TesseractDashboard: React.FC = () => {
                       />
                     ))}
                     <text x="70" y="64" textAnchor="middle" fontSize="20" fontWeight="800" fill="#1a1a2e">
-                      {uptime}%
+                      {uptime}
                     </text>
                     <text x="70" y="80" textAnchor="middle" fontSize="10" fill="#7a8499">
                       Uptime
                     </text>
                   </svg>
-                  {/* Legend */}
-                  <div className="donut-legend animated-legend">
-                    {distribution.map((item, idx) => (
-                      <div key={idx} className="legend-item" style={{ animationDelay: `${0.3 + idx * 0.1}s` }}>
-                        <span className="legend-dot" style={{ background: item.color }}></span>
-                        <span>{item.name}</span>
-                        <strong>{item.value}</strong>
+                </div>
+
+                {/* Legend */}
+                <div className="donut-legend-row">
+                  {distribution.map((item, idx) => (
+                    <div key={idx} className="legend-item-row">
+                      <span className="legend-dot-row" style={{ background: item.color }}></span>
+                      <span>{item.name}</span>
+                      <strong>{item.value}</strong>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Service Cards (Database & Redis) */}
+                <div className="service-cards-row-right">
+                  <div className="service-card-mini">
+                    <div className="service-card-icon-mini">🗄️</div>
+                    <div>
+                      <div className="service-card-label-mini">DATABASE</div>
+                      <div className="service-card-status-mini">
+                        <span className="service-status-dot-mini" style={{ backgroundColor: getServiceStatus(services.database).color }}></span>
+                        <span>{getServiceStatus(services.database).text}</span>
                       </div>
-                    ))}
+                    </div>
+                  </div>
+                  <div className="service-card-mini">
+                    <div className="service-card-icon-mini">📦</div>
+                    <div>
+                      <div className="service-card-label-mini">REDIS</div>
+                      <div className="service-card-status-mini">
+                        <span className="service-status-dot-mini" style={{ backgroundColor: getServiceStatus(services.redis).color }}></span>
+                        <span>{getServiceStatus(services.redis).text}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
